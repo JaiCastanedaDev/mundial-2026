@@ -1,0 +1,38 @@
+import Badge from '../ui/Badge'
+
+const tabs = [
+  { key: 'live', label: 'En vivo' },
+  { key: 'upcoming', label: 'Próximos' },
+  { key: 'finished', label: 'Anteriores' },
+]
+
+export default function MatchTabs({ activeTab, counts, onChange }) {
+  return (
+    <div className="mb-6 flex flex-wrap gap-3">
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          type="button"
+          onClick={() => onChange(tab.key)}
+          className={[
+            'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition',
+            activeTab === tab.key
+              ? 'border-primary bg-primary text-white'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30',
+          ].join(' ')}
+        >
+          {tab.label}
+          {tab.key === 'live' && counts.live > 0 ? (
+            <Badge tone="live" pulse>
+              {counts.live}
+            </Badge>
+          ) : (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+              {counts[tab.key]}
+            </span>
+          )}
+        </button>
+      ))}
+    </div>
+  )
+}

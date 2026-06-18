@@ -1,0 +1,7 @@
+project_id = "polla-mundial-2026"
+
+[functions.sync-matches]
+verify_jwt = false
+
+[functions.calculate-scores]
+verify_jwt = false

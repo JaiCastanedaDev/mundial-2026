@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #0f172a;
+  background: #f8fafc;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-slate-50 text-ink antialiased;
+  }
+
+  button,
+  input,
+  select {
+    @apply font-body;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border border-border bg-surface shadow-panel;
+  }
+
+  .section-title {
+    @apply font-display text-2xl uppercase tracking-normal text-ink;
+  }
+}

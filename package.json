@@ -1,0 +1,11 @@
+{
+  "name": "polla-mundial-2026",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "seed:users": "node scripts/create-users.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.53.0"
+  }
+}
