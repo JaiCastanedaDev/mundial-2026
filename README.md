@@ -27,8 +27,8 @@ npm run dev
 3. Registra secrets:
 
 ```bash
-THESPORTSDB_LEAGUE_ID=...
-THESPORTSDB_SEASON=2026-2027
+WORLDCUP26_BASE_URL=https://worldcup26.ir
+WORLDCUP26_TOKEN=...
 ```
 
 4. Despliega funciones:
@@ -40,6 +40,6 @@ supabase functions deploy calculate-scores
 
 ## Pendiente manual
 
-- Confirmar el `league_id` real del Mundial 2026 en TheSportsDB.
+- Confirmar si `WORLDCUP26_TOKEN` es obligatorio en el entorno objetivo.
 - Configurar el cron de Supabase con `pg_cron`.
 - Completar la lista final de participantes en `scripts/create-users.js`.
