@@ -27,9 +27,8 @@ npm run dev
 3. Registra secrets:
 
 ```bash
-API_FOOTBALL_KEY=...
-API_FOOTBALL_WORLD_CUP_LEAGUE_ID=...
-API_FOOTBALL_WORLD_CUP_SEASON=2026
+THESPORTSDB_LEAGUE_ID=...
+THESPORTSDB_SEASON=2026-2027
 ```
 
 4. Despliega funciones:
@@ -41,6 +40,6 @@ supabase functions deploy calculate-scores
 
 ## Pendiente manual
 
-- Confirmar el `league_id` real del Mundial 2026 en API-Football.
+- Confirmar el `league_id` real del Mundial 2026 en TheSportsDB.
 - Configurar el cron de Supabase con `pg_cron`.
 - Completar la lista final de participantes en `scripts/create-users.js`.
