@@ -111,13 +111,28 @@ export function AuthProvider({ children }) {
     if (error) throw error
   }
 
+  async function signUp({ email, password, displayName }) {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          display_name: displayName,
+          full_name: displayName,
+        },
+      },
+    })
+
+    if (error) throw error
+  }
+
   async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
 
   const value = useMemo(
-    () => ({ session, profile, loading, signIn, signOut }),
+    () => ({ session, profile, loading, signIn, signUp, signOut }),
     [loading, profile, session],
   )
 

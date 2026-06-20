@@ -4,9 +4,12 @@ import { LoaderCircle, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
-  const { session, signIn } = useAuth()
+  const { session, signIn, signUp } = useAuth()
+  const [mode, setMode] = useState('signin')
+  const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -17,12 +20,27 @@ export default function Login() {
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
-      await signIn(email, password)
+      if (mode === 'signup') {
+        await signUp({
+          email,
+          password,
+          displayName,
+        })
+
+        setSuccess('Cuenta creada. Si tu proyecto requiere confirmación por correo, revisa tu email antes de entrar.')
+      } else {
+        await signIn(email, password)
+      }
     } catch (submitError) {
-      setError('Credenciales inválidas. Verifica tu correo y contraseña.')
+      setError(
+        mode === 'signup'
+          ? 'No se pudo crear la cuenta. Revisa los datos e inténtalo de nuevo.'
+          : 'Credenciales inválidas. Verifica tu correo y contraseña.',
+      )
     } finally {
       setLoading(false)
     }
@@ -37,11 +55,57 @@ export default function Login() {
           </div>
           <h1 className="font-display text-5xl uppercase">Polla Mundialista 2026</h1>
           <p className="mt-3 text-sm text-white/70">
-            Ingresa con tu cuenta asignada por el organizador.
+            {mode === 'signup' ? 'Crea tu cuenta para entrar al torneo.' : 'Ingresa con tu cuenta.'}
           </p>
         </div>
 
+        <div className="mb-6 grid grid-cols-2 rounded-lg border border-white/10 bg-white/5 p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signin')
+              setError('')
+              setSuccess('')
+            }}
+            className={[
+              'rounded-md px-3 py-2 text-sm font-semibold transition',
+              mode === 'signin' ? 'bg-white text-slate-950' : 'text-white/75',
+            ].join(' ')}
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signup')
+              setError('')
+              setSuccess('')
+            }}
+            className={[
+              'rounded-md px-3 py-2 text-sm font-semibold transition',
+              mode === 'signup' ? 'bg-white text-slate-950' : 'text-white/75',
+            ].join(' ')}
+          >
+            Registrarse
+          </button>
+        </div>
+
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {mode === 'signup' ? (
+            <label className="block">
+              <span className="mb-2 block text-sm text-white/75">Nombre</span>
+              <input
+                type="text"
+                autoComplete="name"
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                className="w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/35"
+                placeholder="Tu nombre"
+                required
+              />
+            </label>
+          ) : null}
+
           <label className="block">
             <span className="mb-2 block text-sm text-white/75">Email</span>
             <input
@@ -68,6 +132,7 @@ export default function Login() {
             />
           </label>
 
+          {success ? <p className="rounded-lg bg-emerald-500/15 px-4 py-3 text-sm text-emerald-200">{success}</p> : null}
           {error ? <p className="rounded-lg bg-red-500/15 px-4 py-3 text-sm text-red-200">{error}</p> : null}
 
           <button
@@ -76,12 +141,12 @@ export default function Login() {
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 font-semibold text-slate-950 transition hover:bg-[#f6b785] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-            Entrar al torneo
+            {mode === 'signup' ? 'Crear cuenta' : 'Entrar al torneo'}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-white/60">
-          ¿Olvidaste tu contraseña? Habla con el organizador.
+          {mode === 'signup' ? 'Usa un correo válido para recuperar acceso luego.' : '¿Olvidaste tu contraseña? Habla con el organizador.'}
         </p>
       </div>
     </div>
