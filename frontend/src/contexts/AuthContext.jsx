@@ -3,6 +3,27 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
+function slugifyUsername(value) {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '')
+    .slice(0, 18)
+}
+
+function buildProfileDefaults(user) {
+  const email = user?.email ?? ''
+  const emailPrefix = email.split('@')[0] ?? 'usuario'
+  const baseUsername = slugifyUsername(user?.user_metadata?.username || emailPrefix || 'usuario') || 'usuario'
+  const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || emailPrefix || 'Usuario'
+
+  return {
+    username: `${baseUsername}${String(user.id).replace(/-/g, '').slice(0, 6)}`,
+    display_name: displayName,
+  }
+}
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -22,7 +43,7 @@ export function AuthProvider({ children }) {
       setSession(sessionData.session)
 
       if (profileData.data.user) {
-        await loadProfile(profileData.data.user.id)
+        await loadProfile(profileData.data.user.id, profileData.data.user)
       } else {
         setLoading(false)
       }
@@ -36,7 +57,7 @@ export function AuthProvider({ children }) {
       setSession(nextSession)
 
       if (nextSession?.user?.id) {
-        await loadProfile(nextSession.user.id)
+        await loadProfile(nextSession.user.id, nextSession.user)
       } else {
         setProfile(null)
         setLoading(false)
@@ -49,7 +70,7 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  async function loadProfile(userId) {
+  async function loadProfile(userId, user = null) {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -60,7 +81,28 @@ export function AuthProvider({ children }) {
       console.error('Error loading profile', error)
     }
 
-    setProfile(data ?? null)
+    if (!data && user) {
+      const defaults = buildProfileDefaults(user)
+      const { data: createdProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          username: defaults.username,
+          display_name: defaults.display_name,
+        })
+        .select('*')
+        .single()
+
+      if (createError) {
+        console.error('Error creating profile', createError)
+        setProfile(null)
+      } else {
+        setProfile(createdProfile)
+      }
+    } else {
+      setProfile(data ?? null)
+    }
+
     setLoading(false)
   }
 
