@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { ChevronDown, Filter } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { CheckCircle2, ChevronDown, Filter, XCircle } from 'lucide-react'
 import MatchCard from '../components/matches/MatchCard'
 import MatchTabs from '../components/matches/MatchTabs'
 import MyPerformancePanel from '../components/matches/MyPerformancePanel'
@@ -44,6 +44,7 @@ export default function Matches() {
   const savePrediction = useSavePrediction()
   const [activeTab, setActiveTab] = useState('upcoming')
   const [finishedStageFilter, setFinishedStageFilter] = useState('all')
+  const [saveFeedback, setSaveFeedback] = useState(null)
   const worldCupMatches = useMemo(() => matches.filter(isWorldCupMatch), [matches])
   const currentUserId = session?.user?.id ?? profile?.id ?? null
   const groupStageDeadline = useMemo(
@@ -82,17 +83,41 @@ export default function Matches() {
     [currentUserId, worldCupMatches],
   )
 
+  useEffect(() => {
+    if (!saveFeedback) return
+
+    const timeoutId = window.setTimeout(() => setSaveFeedback(null), 3500)
+    return () => window.clearTimeout(timeoutId)
+  }, [saveFeedback])
+
   async function handleSavePrediction(matchId, homeScore, awayScore) {
     if (!currentUserId) {
       throw new Error('Tu sesión todavía no está lista. Recarga la página e inténtalo de nuevo.')
     }
 
-    await savePrediction.mutateAsync({
-      matchId,
-      userId: currentUserId,
-      predictedHomeScore: homeScore,
-      predictedAwayScore: awayScore,
-    })
+    const match = worldCupMatches.find((item) => item.id === matchId)
+
+    try {
+      await savePrediction.mutateAsync({
+        matchId,
+        userId: currentUserId,
+        predictedHomeScore: homeScore,
+        predictedAwayScore: awayScore,
+      })
+
+      setSaveFeedback({
+        tone: 'success',
+        matchId,
+        message: `Prediccion guardada para ${match?.home_team ?? 'el partido'} vs ${match?.away_team ?? ''}.`,
+      })
+    } catch (saveError) {
+      setSaveFeedback({
+        tone: 'error',
+        matchId,
+        message: saveError instanceof Error ? saveError.message : 'No se pudo guardar la prediccion.',
+      })
+      throw saveError
+    }
   }
 
   if (isLoading) {
@@ -121,6 +146,24 @@ export default function Matches() {
           <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             Te faltan {missingGroupStagePredictions} predicciones de fase de grupos. Debes completarlas antes del{' '}
             {groupStageDeadline.toLocaleString('es-CO')}.
+          </div>
+        ) : null}
+
+        {saveFeedback ? (
+          <div
+            className={[
+              'mb-6 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
+              saveFeedback.tone === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                : 'border-red-200 bg-red-50 text-red-900',
+            ].join(' ')}
+          >
+            {saveFeedback.tone === 'success' ? (
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            ) : (
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            )}
+            <p>{saveFeedback.message}</p>
           </div>
         ) : null}
 
@@ -167,6 +210,7 @@ export default function Matches() {
                       currentUserId={currentUserId}
                       isSaving={savePrediction.isPending}
                       groupStageDeadline={groupStageDeadline}
+                      saveState={saveFeedback?.tone === 'success' && saveFeedback.matchId === match.id ? 'success' : 'idle'}
                       onSavePrediction={handleSavePrediction}
                     />
                   ))}
@@ -179,6 +223,7 @@ export default function Matches() {
                   currentUserId={currentUserId}
                   isSaving={savePrediction.isPending}
                   groupStageDeadline={groupStageDeadline}
+                  saveState={saveFeedback?.tone === 'success' && saveFeedback.matchId === match.id ? 'success' : 'idle'}
                   onSavePrediction={handleSavePrediction}
                 />
               ))}

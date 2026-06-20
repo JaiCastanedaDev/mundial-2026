@@ -19,7 +19,7 @@ function formatResultLabel(match, prediction) {
     : { tone: 'warning', text: `Correcto +${prediction.points_earned} pts` }
 }
 
-export default function MatchCard({ match, currentUserId, onSavePrediction, isSaving, groupStageDeadline }) {
+export default function MatchCard({ match, currentUserId, onSavePrediction, isSaving, groupStageDeadline, saveState }) {
   const userPrediction = getUserPrediction(match, currentUserId)
   const resultLabel = formatResultLabel(match, userPrediction)
   const formattedDate = format(new Date(match.match_date), "d MMM yyyy, HH:mm", { locale: es })
@@ -87,6 +87,7 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
             prediction={userPrediction}
             isSaving={isSaving}
             groupStageDeadline={groupStageDeadline}
+            saveState={saveState}
             onSave={(homeScore, awayScore) => onSavePrediction(match.id, homeScore, awayScore)}
           />
           <p className="mt-3 text-sm text-slate-500">
