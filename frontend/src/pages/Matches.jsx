@@ -82,6 +82,10 @@ export default function Matches() {
   )
 
   async function handleSavePrediction(matchId, homeScore, awayScore) {
+    if (!profile?.id) {
+      throw new Error('Tu perfil todavía no está listo. Recarga la página e inténtalo de nuevo.')
+    }
+
     await savePrediction.mutateAsync({
       matchId,
       userId: profile.id,

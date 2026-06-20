@@ -23,7 +23,7 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
   const userPrediction = getUserPrediction(match, currentUserId)
   const resultLabel = formatResultLabel(match, userPrediction)
   const formattedDate = format(new Date(match.match_date), "d MMM yyyy, HH:mm", { locale: es })
-  const canEditPrediction = !isPredictionClosed(match, groupStageDeadline)
+  const canEditPrediction = Boolean(currentUserId) && !isPredictionClosed(match, groupStageDeadline)
 
   return (
     <article className="panel p-5">
