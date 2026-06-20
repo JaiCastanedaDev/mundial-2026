@@ -26,17 +26,39 @@ function buildApiHeaders(): HeadersInit {
     : { accept: 'application/json' }
 }
 
-async function fetchJson(path: string) {
-  const response = await fetch(`${WORLDCUP26_BASE_URL}${path}`, {
-    headers: buildApiHeaders(),
-  })
+async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
-  if (!response.ok) {
-    const body = await response.text()
-    throw new Error(`WorldCup26 API error ${response.status} on ${path}: ${body}`)
+async function fetchJson(path: string, options?: { retries?: number; optional?: boolean }) {
+  const retries = options?.retries ?? 2
+  const optional = options?.optional ?? false
+  let lastError: unknown = null
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(`${WORLDCUP26_BASE_URL}${path}`, {
+        headers: buildApiHeaders(),
+      })
+
+      if (!response.ok) {
+        const body = await response.text()
+        throw new Error(`WorldCup26 API error ${response.status} on ${path}: ${body}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      lastError = error
+      if (attempt < retries) {
+        await sleep(400 * (attempt + 1))
+        continue
+      }
+    }
   }
 
-  return response.json()
+  if (optional) return []
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError))
 }
 
 function parseCollection(payload: any, key: string): any[] {
@@ -196,10 +218,10 @@ function isWorldCupDate(date: Date | null): boolean {
 
 Deno.serve(async () => {
   try {
-    const [gamesPayload, teamsPayload, stadiumsPayload] = await Promise.all([
-      fetchJson('/get/games'),
-      fetchJson('/get/teams'),
-      fetchJson('/get/stadiums'),
+    const gamesPayload = await fetchJson('/get/games', { retries: 2 })
+    const [teamsPayload, stadiumsPayload] = await Promise.all([
+      fetchJson('/get/teams', { retries: 2, optional: true }),
+      fetchJson('/get/stadiums', { retries: 2, optional: true }),
     ])
 
     const games = parseCollection(gamesPayload, 'games')
