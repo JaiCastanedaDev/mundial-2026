@@ -61,6 +61,10 @@ Deno.serve(async () => {
     }
 
     const payload = await response.json()
+    if (!Array.isArray(payload.response)) {
+      throw new Error('Unexpected API-Football response format')
+    }
+
     const matches = payload.response.map((fixture: any) => ({
       api_match_id: fixture.fixture.id,
       home_team: fixture.teams.home.name,
@@ -77,6 +81,14 @@ Deno.serve(async () => {
       away_score_ft: fixture.score?.fulltime?.away,
       venue: fixture.fixture.venue?.name,
     }))
+
+    if (matches.length === 0) {
+      return Response.json({
+        synced: 0,
+        finishedTriggered: 0,
+        message: 'No matches returned by API-Football for the selected league and season',
+      })
+    }
 
     const { error: upsertError } = await supabase
       .from('matches')
@@ -96,6 +108,9 @@ Deno.serve(async () => {
 
     return Response.json({ synced: matches.length, finishedTriggered: finishedIds.length })
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 })
+    return Response.json(
+      { error: error instanceof Error ? error.message : String(error) },
+      { status: 500 },
+    )
   }
 })
