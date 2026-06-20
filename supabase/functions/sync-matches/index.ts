@@ -30,6 +30,7 @@ function mapStatus(apiStatus: string): string {
 
 function mapStage(round: string): string {
   if (/group/i.test(round)) return 'Group Stage'
+  if (/32/i.test(round)) return 'Round of 32'
   if (/16/i.test(round)) return 'Round of 16'
   if (/quarter/i.test(round)) return 'Quarter-finals'
   if (/semi/i.test(round)) return 'Semi-finals'

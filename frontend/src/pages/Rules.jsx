@@ -1,5 +1,6 @@
 const phases = [
   ['Fase de grupos', '3 pts exacto', '1 pt resultado correcto'],
+  ['Dieciseisavos', '4 pts exacto', '2 pts resultado correcto'],
   ['Octavos', '4 pts exacto', '2 pts resultado correcto'],
   ['Cuartos', '5 pts exacto', '3 pts resultado correcto'],
   ['Semifinales', '5 pts exacto', '4 pts resultado correcto'],

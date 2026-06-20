@@ -1,5 +1,6 @@
 export const STAGE_POINTS = {
   'Group Stage': { exact: 3, correct: 1 },
+  'Round of 32': { exact: 4, correct: 2 },
   'Round of 16': { exact: 4, correct: 2 },
   'Quarter-finals': { exact: 5, correct: 3 },
   'Semi-finals': { exact: 5, correct: 4 },
