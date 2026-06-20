@@ -61,22 +61,24 @@ Deno.serve(async () => {
       throw new Error('Unexpected TheSportsDB response format')
     }
 
-    const matches = payload.events.map((event: any) => ({
-      api_match_id: Number(event.idEvent),
-      home_team: event.strHomeTeam,
-      away_team: event.strAwayTeam,
-      home_team_logo: event.strHomeTeamBadge ?? null,
-      away_team_logo: event.strAwayTeamBadge ?? null,
-      match_date: event.strTimestamp ?? `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`,
-      stage: mapStage(event.strGroup ?? event.intRound?.toString?.() ?? ''),
-      group_name: extractGroup(event.strGroup ?? ''),
-      status: mapStatus(event),
-      home_score: event.intHomeScore !== null ? Number(event.intHomeScore) : null,
-      away_score: event.intAwayScore !== null ? Number(event.intAwayScore) : null,
-      home_score_ft: event.intHomeScore !== null ? Number(event.intHomeScore) : null,
-      away_score_ft: event.intAwayScore !== null ? Number(event.intAwayScore) : null,
-      venue: event.strVenue ?? null,
-    }))
+    const matches = payload.events
+      .filter((event: any) => event.idEvent && event.strHomeTeam && event.strAwayTeam && event.dateEvent)
+      .map((event: any) => ({
+        api_match_id: Number(event.idEvent),
+        home_team: event.strHomeTeam,
+        away_team: event.strAwayTeam,
+        home_team_logo: event.strHomeTeamBadge ?? null,
+        away_team_logo: event.strAwayTeamBadge ?? null,
+        match_date: event.strTimestamp ?? `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`,
+        stage: mapStage(event.strGroup ?? event.intRound?.toString?.() ?? ''),
+        group_name: extractGroup(event.strGroup ?? ''),
+        status: mapStatus(event),
+        home_score: event.intHomeScore !== null ? Number(event.intHomeScore) : null,
+        away_score: event.intAwayScore !== null ? Number(event.intAwayScore) : null,
+        home_score_ft: event.intHomeScore !== null ? Number(event.intHomeScore) : null,
+        away_score_ft: event.intAwayScore !== null ? Number(event.intAwayScore) : null,
+        venue: event.strVenue ?? null,
+      }))
 
     if (matches.length === 0) {
       return Response.json({
@@ -91,6 +93,14 @@ Deno.serve(async () => {
       .upsert(matches, { onConflict: 'api_match_id' })
 
     if (upsertError) throw upsertError
+
+    const syncedApiMatchIds = matches.map((match: any) => match.api_match_id)
+    const { error: cleanupError } = await supabase
+      .from('matches')
+      .delete()
+      .not('api_match_id', 'in', `(${syncedApiMatchIds.join(',')})`)
+
+    if (cleanupError) throw cleanupError
 
     const finishedIds = matches
       .filter((match: any) => match.status === 'finished')
