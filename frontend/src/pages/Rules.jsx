@@ -27,25 +27,25 @@ export default function Rules() {
   return (
     <section className="space-y-8">
       <div>
-        <p className="text-sm text-slate-500">Sistema de juego</p>
+        <p className="text-sm text-muted">Sistema de juego</p>
         <h1 className="section-title">Reglas</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {phases.map(([phase, exact, correct]) => (
           <article key={phase} className="panel p-5">
-            <h2 className="font-display text-2xl uppercase text-primary">{phase}</h2>
-            <div className="mt-4 space-y-3 text-sm text-slate-600">
-              <p className="rounded-md bg-green-50 px-3 py-2 text-green-700">{exact}</p>
-              <p className="rounded-md bg-amber-50 px-3 py-2 text-amber-700">{correct}</p>
+            <h2 className="font-display text-2xl uppercase text-accent">{phase}</h2>
+            <div className="mt-4 space-y-3 text-sm">
+              <p className="rounded-xl border border-[#2f5c46] bg-[#173327] px-3 py-2 text-[#9be1b5]">{exact}</p>
+              <p className="rounded-xl border border-[#6a5530] bg-[#3a2d14] px-3 py-2 text-accent">{correct}</p>
             </div>
           </article>
         ))}
       </div>
 
       <div className="panel p-6">
-        <h2 className="font-display text-2xl uppercase text-primary">Desempates</h2>
-        <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-slate-600">
+        <h2 className="font-display text-2xl uppercase text-accent">Desempates</h2>
+        <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Mayor cantidad de marcadores exactos.</li>
           <li>Mayor cantidad de resultados correctos.</li>
           <li>Si persiste, la posición queda empatada.</li>
@@ -55,8 +55,8 @@ export default function Rules() {
       <div className="grid gap-4 lg:grid-cols-3">
         {examples.map((example) => (
           <article key={example.title} className="panel p-5">
-            <h2 className="font-display text-2xl uppercase text-slate-900">{example.title}</h2>
-            <p className="mt-3 text-sm text-slate-600">{example.body}</p>
+            <h2 className="font-display text-2xl uppercase text-ink">{example.title}</h2>
+            <p className="mt-3 text-sm text-muted">{example.body}</p>
           </article>
         ))}
       </div>

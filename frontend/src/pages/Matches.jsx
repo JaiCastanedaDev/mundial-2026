@@ -129,7 +129,7 @@ export default function Matches() {
   }
 
   if (error) {
-    return <div className="panel p-6 text-red-600">No se pudieron cargar los partidos: {error.message}</div>
+    return <div className="panel p-6 text-[#ff9f92]">No se pudieron cargar los partidos: {error.message}</div>
   }
 
   return (
@@ -137,13 +137,13 @@ export default function Matches() {
       <section>
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm text-slate-500">Panel principal</p>
+            <p className="text-sm text-muted">Panel principal</p>
             <h1 className="section-title">Partidos</h1>
           </div>
         </div>
 
         {groupStageDeadline && new Date() < groupStageDeadline ? (
-          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="mb-6 rounded-xl border border-[#6a5530] bg-[#3a2d14] px-4 py-3 text-sm text-accent">
             Te faltan {missingGroupStagePredictions} predicciones de fase de grupos. Debes completarlas antes del{' '}
             {groupStageDeadline.toLocaleString('es-CO')}.
           </div>
@@ -154,8 +154,8 @@ export default function Matches() {
             className={[
               'mb-6 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
               saveFeedback.tone === 'success'
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                : 'border-red-200 bg-red-50 text-red-900',
+                ? 'border-[#2f5c46] bg-[#173327] text-[#9be1b5]'
+                : 'border-[#6f2e28] bg-[#3c1714] text-[#ff9b8d]',
             ].join(' ')}
           >
             {saveFeedback.tone === 'success' ? (
@@ -179,10 +179,10 @@ export default function Matches() {
 
         {activeTab === 'finished' ? (
           <div className="mb-4 flex items-center justify-end">
-            <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm">
-              <Filter className="h-4 w-4 text-slate-500" />
+            <label className="flex items-center gap-2 rounded-full border border-border bg-surface/75 px-4 py-2 text-sm text-ink">
+              <Filter className="h-4 w-4 text-muted" />
               <select
-                className="bg-transparent pr-6 text-slate-700 outline-none"
+                className="bg-transparent pr-6 text-ink outline-none"
                 value={finishedStageFilter}
                 onChange={(event) => setFinishedStageFilter(event.target.value)}
               >
@@ -193,7 +193,7 @@ export default function Matches() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
+              <ChevronDown className="h-4 w-4 text-muted" />
             </label>
           </div>
         ) : null}
@@ -202,7 +202,7 @@ export default function Matches() {
           {activeTab === 'upcoming'
             ? groupedUpcoming.map((group) => (
                 <div key={group.label} className="space-y-4">
-                  <h2 className="font-display text-2xl uppercase text-slate-800">{group.label}</h2>
+                  <h2 className="font-display text-2xl uppercase text-accent">{group.label}</h2>
                   {group.items.map((match) => (
                     <MatchCard
                       key={match.id}
@@ -229,7 +229,7 @@ export default function Matches() {
               ))}
 
           {visibleMatches.length === 0 ? (
-            <div className="panel p-8 text-center text-slate-500">No hay partidos para esta vista.</div>
+            <div className="panel p-8 text-center text-muted">No hay partidos para esta vista.</div>
           ) : null}
         </div>
       </section>
