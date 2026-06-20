@@ -25,8 +25,8 @@ function mapStage(roundValue: string): string {
   if (!roundValue) return 'Group Stage'
 
   if (/group/i.test(roundValue)) return 'Group Stage'
-  if (/round\s*of\s*32|32/i.test(roundValue)) return 'Round of 32'
-  if (/round\s*of\s*16|16/i.test(roundValue)) return 'Round of 16'
+  if (/round\s*of\s*32/i.test(roundValue) || /^32$/.test(roundValue)) return 'Round of 32'
+  if (/round\s*of\s*16/i.test(roundValue) || /^16$/.test(roundValue)) return 'Round of 16'
   if (/quarter/i.test(roundValue)) return 'Quarter-finals'
   if (/semi/i.test(roundValue)) return 'Semi-finals'
   if (/(3rd|third)/i.test(roundValue)) return 'Third Place'
@@ -36,7 +36,7 @@ function mapStage(roundValue: string): string {
 }
 
 function extractGroup(roundValue: string): string | null {
-  const match = roundValue.match(/Group\s+([A-Z])/i)
+  const match = roundValue.match(/(?:Group|Grp|Gr)\s*([A-Z0-9]+)/i)
   return match ? match[1].toUpperCase() : null
 }
 
@@ -45,7 +45,7 @@ Deno.serve(async () => {
     if (!THESPORTSDB_LEAGUE_ID) throw new Error('Missing THESPORTSDB_LEAGUE_ID secret')
 
     const response = await fetch(
-      `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}/eventsseason.php?id=${THESPORTSDB_LEAGUE_ID}`,
+      `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}/eventsseason.php?id=${THESPORTSDB_LEAGUE_ID}&s=${WORLD_CUP_SEASON}`,
       {
         headers: { accept: 'application/json' },
       },
@@ -67,9 +67,9 @@ Deno.serve(async () => {
       away_team: event.strAwayTeam,
       home_team_logo: event.strHomeTeamBadge ?? null,
       away_team_logo: event.strAwayTeamBadge ?? null,
-      match_date: `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`,
-      stage: mapStage(event.strRound ?? event.intRound?.toString?.() ?? ''),
-      group_name: extractGroup(event.strRound ?? ''),
+      match_date: event.strTimestamp ?? `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`,
+      stage: mapStage(event.strGroup ?? event.intRound?.toString?.() ?? ''),
+      group_name: extractGroup(event.strGroup ?? ''),
       status: mapStatus(event),
       home_score: event.intHomeScore !== null ? Number(event.intHomeScore) : null,
       away_score: event.intAwayScore !== null ? Number(event.intAwayScore) : null,
