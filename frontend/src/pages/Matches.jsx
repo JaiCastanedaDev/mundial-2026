@@ -11,22 +11,12 @@ import { useRanking } from '../hooks/useRanking'
 
 const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
 const WORLD_CUP_2026_END = new Date('2026-07-20T00:00:00Z')
-const WORLD_CUP_STAGES = new Set([
-  'Group Stage',
-  'Round of 32',
-  'Round of 16',
-  'Quarter-finals',
-  'Semi-finals',
-  'Third Place',
-  'Final',
-])
 
 function isWorldCupMatch(match) {
   const matchDate = new Date(match.match_date)
   const hasValidDate = !Number.isNaN(matchDate.getTime())
-  const hasValidStage = WORLD_CUP_STAGES.has(match.stage)
 
-  return hasValidDate && hasValidStage && matchDate >= WORLD_CUP_2026_START && matchDate < WORLD_CUP_2026_END
+  return hasValidDate && matchDate >= WORLD_CUP_2026_START && matchDate < WORLD_CUP_2026_END
 }
 
 function groupMatches(matches) {
