@@ -22,9 +22,9 @@ export default function Ranking() {
   return (
     <section className="space-y-8 pb-6">
       <div>
-        <h1 className="font-display text-5xl tracking-normal text-ink sm:text-7xl">World Rankings</h1>
+        <h1 className="font-display text-5xl tracking-normal text-ink sm:text-7xl">Ranking de puntos</h1>
         <p className="mt-4 max-w-xl text-2xl leading-tight text-muted">
-          Top predictors from across the tournament. See who is setting the pace and how your picks stack up.
+          Principales pronosticadores de todo el torneo. Mira quién está marcando el ritmo y cómo se comparan tus predicciones.
         </p>
       </div>
       <RankingTable rows={data} currentUserId={profile?.id} />
