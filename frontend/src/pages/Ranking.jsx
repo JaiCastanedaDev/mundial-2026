@@ -16,14 +16,16 @@ export default function Ranking() {
   }
 
   if (error) {
-    return <div className="panel p-6 text-red-600">No se pudo cargar el ranking: {error.message}</div>
+    return <div className="panel p-6 text-[#ff9f92]">No se pudo cargar el ranking: {error.message}</div>
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8 pb-6">
       <div>
-        <p className="text-sm text-muted">Clasificación general</p>
-        <h1 className="section-title">Ranking</h1>
+        <h1 className="font-display text-5xl tracking-normal text-ink sm:text-7xl">World Rankings</h1>
+        <p className="mt-4 max-w-xl text-2xl leading-tight text-muted">
+          Top predictors from across the tournament. See who is setting the pace and how your picks stack up.
+        </p>
       </div>
       <RankingTable rows={data} currentUserId={profile?.id} />
     </section>
