@@ -1,9 +1,9 @@
 const toneClasses = {
-  default: 'bg-slate-100 text-slate-700',
-  live: 'bg-red-100 text-red-700',
-  success: 'bg-green-100 text-green-700',
-  warning: 'bg-amber-100 text-amber-700',
-  dark: 'bg-primary text-white',
+  default: 'bg-primary-light text-ink border border-border',
+  live: 'bg-[#3c1714] text-[#ff9b8d] border border-[#6f2e28]',
+  success: 'bg-[#173327] text-[#9be1b5] border border-[#2f5c46]',
+  warning: 'bg-[#3a2d14] text-accent border border-[#6a5530]',
+  dark: 'bg-accent text-primary',
 }
 
 export default function Badge({ children, tone = 'default', pulse = false }) {

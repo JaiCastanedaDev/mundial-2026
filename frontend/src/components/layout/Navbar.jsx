@@ -18,7 +18,7 @@ function UserBadge({ profile }) {
     .toUpperCase()
 
   return (
-    <div className="flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-3 py-2 text-sm text-white">
+    <div className="flex items-center gap-3 rounded-full border border-border bg-surface/80 px-3 py-2 text-sm text-ink">
       <span
         className="flex h-8 w-8 items-center justify-center rounded-full font-semibold"
         style={{ backgroundColor: profile?.avatar_color ?? '#3B82F6' }}
@@ -35,14 +35,18 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="border-b border-white/10 bg-primary text-white">
+    <header className="sticky top-0 z-20 border-b border-border/80 bg-primary/95 text-ink backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 lg:px-8">
         <div className="flex items-center gap-3">
-          <button type="button" className="rounded-md p-2 md:hidden" onClick={() => setOpen((v) => !v)}>
+          <button
+            type="button"
+            className="rounded-md border border-border bg-surface/70 p-2 md:hidden"
+            onClick={() => setOpen((v) => !v)}
+          >
             <Menu className="h-5 w-5" />
           </button>
-          <NavLink to="/partidos" className="font-display text-3xl uppercase">
-            <span className="mr-2">⚽</span>Polla 2026
+          <NavLink to="/partidos" className="font-display text-3xl uppercase text-accent">
+            <span className="mr-2 text-ink">⚽</span>Polla 2026
           </NavLink>
         </div>
 
@@ -54,7 +58,9 @@ export default function Navbar() {
               className={({ isActive }) =>
                 [
                   'flex items-center gap-2 rounded-md px-4 py-2 text-sm transition',
-                  isActive ? 'bg-white text-primary' : 'text-white/80 hover:bg-white/10 hover:text-white',
+                  isActive
+                    ? 'bg-accent text-primary'
+                    : 'text-muted hover:bg-surface/70 hover:text-ink',
                 ].join(' ')
               }
             >
@@ -69,7 +75,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={signOut}
-            className="hidden rounded-md border border-white/15 px-3 py-2 text-sm text-white/80 transition hover:bg-white/10 hover:text-white md:flex md:items-center md:gap-2"
+            className="hidden rounded-md border border-border bg-surface/60 px-3 py-2 text-sm text-muted transition hover:bg-surface hover:text-ink md:flex md:items-center md:gap-2"
           >
             <LogOut className="h-4 w-4" />
             Salir
@@ -78,7 +84,7 @@ export default function Navbar() {
       </div>
 
       {open ? (
-        <div className="border-t border-white/10 px-4 py-3 md:hidden">
+        <div className="border-t border-border px-4 py-3 md:hidden">
           <nav className="flex flex-col gap-2">
             {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
@@ -88,7 +94,7 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   [
                     'flex items-center gap-2 rounded-md px-4 py-3 text-sm',
-                    isActive ? 'bg-white text-primary' : 'bg-white/5 text-white',
+                    isActive ? 'bg-accent text-primary' : 'bg-surface/70 text-ink',
                   ].join(' ')
                 }
               >
@@ -99,7 +105,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={signOut}
-              className="flex items-center gap-2 rounded-md bg-white/5 px-4 py-3 text-left text-sm text-white"
+              className="flex items-center gap-2 rounded-md bg-surface/70 px-4 py-3 text-left text-sm text-ink"
             >
               <LogOut className="h-4 w-4" />
               Salir

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  color: #0f172a;
-  background: #f8fafc;
+  color: #e8f0ea;
+  background: #031f16;
   font-family: 'Inter', sans-serif;
 }
 
@@ -23,7 +23,8 @@ body {
   }
 
   body {
-    @apply bg-slate-50 text-ink antialiased;
+    @apply bg-primary bg-pitch text-ink antialiased;
+    background-attachment: fixed;
   }
 
   button,
@@ -35,7 +36,7 @@ body {
 
 @layer components {
   .panel {
-    @apply rounded-lg border border-border bg-surface shadow-panel;
+    @apply rounded-lg border border-border bg-surface/85 shadow-panel backdrop-blur-sm;
   }
 
   .section-title {

@@ -20,7 +20,7 @@ function Avatar({ name, color }) {
 
 function PositionCell({ position }) {
   const medalTone =
-    position === 1 ? 'text-yellow-500' : position === 2 ? 'text-slate-400' : position === 3 ? 'text-amber-700' : 'text-slate-400'
+    position === 1 ? 'text-accent' : position === 2 ? 'text-[#b7c3bc]' : position === 3 ? 'text-[#b58a57]' : 'text-muted'
 
   return (
     <div className="flex items-center gap-2 font-semibold">
@@ -35,7 +35,7 @@ export default function RankingTable({ rows, currentUserId }) {
     <div className="panel overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
-          <thead className="bg-slate-50 text-left text-slate-500">
+          <thead className="bg-primary-light text-left text-muted">
             <tr>
               <th className="px-4 py-4 font-medium">Pos.</th>
               <th className="px-4 py-4 font-medium">Jugador</th>
@@ -50,8 +50,8 @@ export default function RankingTable({ rows, currentUserId }) {
               <tr
                 key={row.id}
                 className={[
-                  'border-t border-slate-200',
-                  row.id === currentUserId ? 'bg-primary/5' : 'bg-white',
+                  'border-t border-border',
+                  row.id === currentUserId ? 'bg-[#0f2e22]' : 'bg-surface/45',
                 ].join(' ')}
               >
                 <td className="px-4 py-4">
@@ -61,12 +61,12 @@ export default function RankingTable({ rows, currentUserId }) {
                   <div className="flex items-center gap-3">
                     <Avatar name={row.display_name} color={row.avatar_color} />
                     <div>
-                      <p className="font-semibold text-slate-900">{row.display_name}</p>
-                      <p className="text-xs text-slate-500">@{row.username}</p>
+                      <p className="font-semibold text-ink">{row.display_name}</p>
+                      <p className="text-xs text-muted">@{row.username}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 font-display text-3xl uppercase text-primary">{row.total_points}</td>
+                <td className="px-4 py-4 font-display text-3xl uppercase text-accent">{row.total_points}</td>
                 <td className="px-4 py-4">{row.exact_scores}</td>
                 <td className="px-4 py-4">{row.correct_results}</td>
                 <td className="px-4 py-4">

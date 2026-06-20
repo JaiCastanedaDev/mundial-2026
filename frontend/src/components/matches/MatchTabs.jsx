@@ -17,8 +17,8 @@ export default function MatchTabs({ activeTab, counts, onChange }) {
           className={[
             'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition',
             activeTab === tab.key
-              ? 'border-primary bg-primary text-white'
-              : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30',
+              ? 'border-accent bg-accent text-primary'
+              : 'border-border bg-surface/75 text-muted hover:border-accent/50 hover:text-ink',
           ].join(' ')}
         >
           {tab.label}
@@ -27,7 +27,7 @@ export default function MatchTabs({ activeTab, counts, onChange }) {
               {counts.live}
             </Badge>
           ) : (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+            <span className="rounded-full bg-primary-light px-2 py-0.5 text-xs text-ink/85">
               {counts[tab.key]}
             </span>
           )}

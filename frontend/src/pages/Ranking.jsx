@@ -22,7 +22,7 @@ export default function Ranking() {
   return (
     <section className="space-y-6">
       <div>
-        <p className="text-sm text-slate-500">Clasificación general</p>
+        <p className="text-sm text-muted">Clasificación general</p>
         <h1 className="section-title">Ranking</h1>
       </div>
       <RankingTable rows={data} currentUserId={profile?.id} />
