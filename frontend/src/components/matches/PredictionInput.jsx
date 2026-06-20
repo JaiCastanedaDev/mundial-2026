@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { LoaderCircle, Save } from 'lucide-react'
-import { isPredictionClosed } from '../../lib/scoring'
+import { getPredictionHelperText, isPredictionClosed } from '../../lib/scoring'
 
 function clampScore(value) {
   const parsed = Number.parseInt(value, 10)
@@ -8,10 +8,10 @@ function clampScore(value) {
   return Math.min(parsed, 99)
 }
 
-export default function PredictionInput({ match, prediction, onSave, isSaving }) {
+export default function PredictionInput({ match, prediction, onSave, isSaving, groupStageDeadline }) {
   const [homeScore, setHomeScore] = useState(prediction?.predicted_home_score ?? '')
   const [awayScore, setAwayScore] = useState(prediction?.predicted_away_score ?? '')
-  const closed = isPredictionClosed(match)
+  const closed = isPredictionClosed(match, groupStageDeadline)
 
   useEffect(() => {
     setHomeScore(prediction?.predicted_home_score ?? '')
@@ -59,7 +59,7 @@ export default function PredictionInput({ match, prediction, onSave, isSaving })
         </button>
       </div>
       <p className="mt-3 text-sm text-slate-500">
-        {closed ? 'Predicción cerrada. El partido ya inició o cambió de estado.' : helperText}
+        {closed ? getPredictionHelperText(match, groupStageDeadline) : helperText}
       </p>
     </div>
   )

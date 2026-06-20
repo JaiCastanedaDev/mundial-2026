@@ -3,6 +3,13 @@ export function getUserPrediction(match, userId) {
   return match.predictions.find((prediction) => prediction.user_id === userId) ?? null
 }
 
+export function countMissingGroupStagePredictions(matches, userId) {
+  return matches.filter((match) => {
+    const isGroupStage = match.stage === 'Group Stage' || String(match.stage) === '1'
+    return isGroupStage && !getUserPrediction(match, userId)
+  }).length
+}
+
 export function buildPerformanceSummary(matches, userId) {
   const finishedMatches = matches.filter((match) => match.status === 'finished')
 

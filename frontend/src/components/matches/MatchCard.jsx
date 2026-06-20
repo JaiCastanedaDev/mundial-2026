@@ -3,6 +3,7 @@ import { es } from 'date-fns/locale'
 import Badge from '../ui/Badge'
 import PredictionInput from './PredictionInput'
 import { getUserPrediction } from '../../hooks/usePredictions'
+import { isPredictionClosed } from '../../lib/scoring'
 
 function formatResultLabel(match, prediction) {
   if (!prediction) return { tone: 'default', text: 'No predicho' }
@@ -18,10 +19,11 @@ function formatResultLabel(match, prediction) {
     : { tone: 'warning', text: `Correcto +${prediction.points_earned} pts` }
 }
 
-export default function MatchCard({ match, currentUserId, onSavePrediction, isSaving }) {
+export default function MatchCard({ match, currentUserId, onSavePrediction, isSaving, groupStageDeadline }) {
   const userPrediction = getUserPrediction(match, currentUserId)
   const resultLabel = formatResultLabel(match, userPrediction)
   const formattedDate = format(new Date(match.match_date), "d MMM yyyy, HH:mm", { locale: es })
+  const canEditPrediction = !isPredictionClosed(match, groupStageDeadline)
 
   return (
     <article className="panel p-5">
@@ -78,12 +80,13 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
         </div>
       </div>
 
-      {match.status === 'scheduled' ? (
+      {canEditPrediction ? (
         <>
           <PredictionInput
             match={match}
             prediction={userPrediction}
             isSaving={isSaving}
+            groupStageDeadline={groupStageDeadline}
             onSave={(homeScore, awayScore) => onSavePrediction(match.id, homeScore, awayScore)}
           />
           <p className="mt-3 text-sm text-slate-500">

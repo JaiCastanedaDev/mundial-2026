@@ -32,6 +32,28 @@ export function calculatePoints(stage, predictedHome, predictedAway, realHome, r
   return { points: 0, type: 'wrong' }
 }
 
-export function isPredictionClosed(match) {
+export function isGroupStageMatch(match) {
+  return match?.stage === 'Group Stage' || String(match?.stage) === '1'
+}
+
+export function parsePredictionDeadline(value) {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export function isPredictionClosed(match, groupStageDeadline) {
+  if (isGroupStageMatch(match)) {
+    return groupStageDeadline ? groupStageDeadline <= new Date() : false
+  }
+
   return match.status !== 'scheduled' || new Date(match.match_date) <= new Date()
+}
+
+export function getPredictionHelperText(match, groupStageDeadline) {
+  if (isGroupStageMatch(match) && groupStageDeadline && groupStageDeadline > new Date()) {
+    return `Tienes hasta el ${groupStageDeadline.toLocaleString('es-CO')} para completar la fase de grupos.`
+  }
+
+  return 'Predicción cerrada. El partido ya inició o cambió de estado.'
 }

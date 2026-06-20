@@ -5,9 +5,11 @@ import MatchTabs from '../components/matches/MatchTabs'
 import MyPerformancePanel from '../components/matches/MyPerformancePanel'
 import Spinner from '../components/ui/Spinner'
 import { useAuth } from '../contexts/AuthContext'
+import { useAppSettings } from '../hooks/useAppSettings'
 import { useMatches, useSavePrediction } from '../hooks/useMatches'
-import { buildPerformanceSummary } from '../hooks/usePredictions'
+import { buildPerformanceSummary, countMissingGroupStagePredictions } from '../hooks/usePredictions'
 import { useRanking } from '../hooks/useRanking'
+import { isGroupStageMatch, isPredictionClosed, parsePredictionDeadline } from '../lib/scoring'
 
 const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
 const WORLD_CUP_2026_END = new Date('2026-07-20T00:00:00Z')
@@ -37,21 +39,26 @@ function groupMatches(matches) {
 export default function Matches() {
   const { profile } = useAuth()
   const { data: matches = [], isLoading, error } = useMatches()
+  const { data: appSettings = {} } = useAppSettings()
   const { data: ranking = [] } = useRanking()
   const savePrediction = useSavePrediction()
   const [activeTab, setActiveTab] = useState('upcoming')
   const [finishedStageFilter, setFinishedStageFilter] = useState('all')
   const worldCupMatches = useMemo(() => matches.filter(isWorldCupMatch), [matches])
+  const groupStageDeadline = useMemo(
+    () => parsePredictionDeadline(appSettings.group_stage_prediction_deadline),
+    [appSettings.group_stage_prediction_deadline],
+  )
 
   const byStatus = useMemo(
     () => ({
       live: worldCupMatches.filter((match) => match.status === 'live'),
-      upcoming: worldCupMatches.filter((match) => match.status === 'scheduled'),
+      upcoming: worldCupMatches.filter((match) => !isPredictionClosed(match, groupStageDeadline)),
       finished: worldCupMatches
         .filter((match) => match.status === 'finished')
         .sort((a, b) => new Date(b.match_date) - new Date(a.match_date)),
     }),
-    [worldCupMatches],
+    [groupStageDeadline, worldCupMatches],
   )
 
   const filteredFinished = useMemo(() => {
@@ -69,6 +76,10 @@ export default function Matches() {
   )
   const rankingEntry = ranking.find((entry) => entry.id === profile?.id)
   const finishedStages = [...new Set(byStatus.finished.map((match) => match.stage))]
+  const missingGroupStagePredictions = useMemo(
+    () => countMissingGroupStagePredictions(worldCupMatches.filter(isGroupStageMatch), profile?.id),
+    [profile?.id, worldCupMatches],
+  )
 
   async function handleSavePrediction(matchId, homeScore, awayScore) {
     await savePrediction.mutateAsync({
@@ -100,6 +111,13 @@ export default function Matches() {
             <h1 className="section-title">Partidos</h1>
           </div>
         </div>
+
+        {groupStageDeadline && new Date() < groupStageDeadline ? (
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Te faltan {missingGroupStagePredictions} predicciones de fase de grupos. Debes completarlas antes del{' '}
+            {groupStageDeadline.toLocaleString('es-CO')}.
+          </div>
+        ) : null}
 
         <MatchTabs
           activeTab={activeTab}
@@ -143,6 +161,7 @@ export default function Matches() {
                       match={match}
                       currentUserId={profile?.id}
                       isSaving={savePrediction.isPending}
+                      groupStageDeadline={groupStageDeadline}
                       onSavePrediction={handleSavePrediction}
                     />
                   ))}
@@ -154,6 +173,7 @@ export default function Matches() {
                   match={match}
                   currentUserId={profile?.id}
                   isSaving={savePrediction.isPending}
+                  groupStageDeadline={groupStageDeadline}
                   onSavePrediction={handleSavePrediction}
                 />
               ))}
