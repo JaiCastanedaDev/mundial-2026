@@ -5,8 +5,23 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '
 const THESPORTSDB_LEAGUE_ID = Deno.env.get('THESPORTSDB_LEAGUE_ID') ?? ''
 const THESPORTSDB_API_KEY = '123'
 const WORLD_CUP_SEASON = Deno.env.get('THESPORTSDB_SEASON') ?? '2026-2027'
+const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
+const WORLD_CUP_2026_END = new Date('2026-07-20T00:00:00Z')
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+
+function getEventDate(event: any): Date | null {
+  const rawDate = event.strTimestamp ?? `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`
+  const parsedDate = new Date(rawDate)
+
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate
+}
+
+function isWorldCupEvent(event: any): boolean {
+  const eventDate = getEventDate(event)
+
+  return eventDate !== null && eventDate >= WORLD_CUP_2026_START && eventDate < WORLD_CUP_2026_END
+}
 
 function mapStatus(event: any): string {
   const homeScore = event.intHomeScore
@@ -63,13 +78,14 @@ Deno.serve(async () => {
 
     const matches = payload.events
       .filter((event: any) => event.idEvent && event.strHomeTeam && event.strAwayTeam && event.dateEvent)
+      .filter(isWorldCupEvent)
       .map((event: any) => ({
         api_match_id: Number(event.idEvent),
         home_team: event.strHomeTeam,
         away_team: event.strAwayTeam,
         home_team_logo: event.strHomeTeamBadge ?? null,
         away_team_logo: event.strAwayTeamBadge ?? null,
-        match_date: event.strTimestamp ?? `${event.dateEvent}T${event.strTime ?? '00:00:00'}Z`,
+        match_date: getEventDate(event)?.toISOString(),
         stage: mapStage(event.strGroup ?? event.intRound?.toString?.() ?? ''),
         group_name: extractGroup(event.strGroup ?? ''),
         status: mapStatus(event),
