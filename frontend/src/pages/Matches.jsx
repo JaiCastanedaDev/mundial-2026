@@ -37,7 +37,7 @@ function groupMatches(matches) {
 }
 
 export default function Matches() {
-  const { profile } = useAuth()
+  const { profile, session } = useAuth()
   const { data: matches = [], isLoading, error } = useMatches()
   const { data: appSettings = {} } = useAppSettings()
   const { data: ranking = [] } = useRanking()
@@ -45,6 +45,7 @@ export default function Matches() {
   const [activeTab, setActiveTab] = useState('upcoming')
   const [finishedStageFilter, setFinishedStageFilter] = useState('all')
   const worldCupMatches = useMemo(() => matches.filter(isWorldCupMatch), [matches])
+  const currentUserId = session?.user?.id ?? profile?.id ?? null
   const groupStageDeadline = useMemo(
     () => parsePredictionDeadline(appSettings.group_stage_prediction_deadline),
     [appSettings.group_stage_prediction_deadline],
@@ -71,24 +72,24 @@ export default function Matches() {
 
   const groupedUpcoming = useMemo(() => Object.values(groupMatches(byStatus.upcoming)), [byStatus.upcoming])
   const performance = useMemo(
-    () => buildPerformanceSummary(worldCupMatches, profile?.id),
-    [worldCupMatches, profile?.id],
+    () => buildPerformanceSummary(worldCupMatches, currentUserId),
+    [currentUserId, worldCupMatches],
   )
   const rankingEntry = ranking.find((entry) => entry.id === profile?.id)
   const finishedStages = [...new Set(byStatus.finished.map((match) => match.stage))]
   const missingGroupStagePredictions = useMemo(
-    () => countMissingGroupStagePredictions(worldCupMatches.filter(isGroupStageMatch), profile?.id),
-    [profile?.id, worldCupMatches],
+    () => countMissingGroupStagePredictions(worldCupMatches.filter(isGroupStageMatch), currentUserId),
+    [currentUserId, worldCupMatches],
   )
 
   async function handleSavePrediction(matchId, homeScore, awayScore) {
-    if (!profile?.id) {
-      throw new Error('Tu perfil todavía no está listo. Recarga la página e inténtalo de nuevo.')
+    if (!currentUserId) {
+      throw new Error('Tu sesión todavía no está lista. Recarga la página e inténtalo de nuevo.')
     }
 
     await savePrediction.mutateAsync({
       matchId,
-      userId: profile.id,
+      userId: currentUserId,
       predictedHomeScore: homeScore,
       predictedAwayScore: awayScore,
     })
@@ -163,7 +164,7 @@ export default function Matches() {
                     <MatchCard
                       key={match.id}
                       match={match}
-                      currentUserId={profile?.id}
+                      currentUserId={currentUserId}
                       isSaving={savePrediction.isPending}
                       groupStageDeadline={groupStageDeadline}
                       onSavePrediction={handleSavePrediction}
@@ -175,7 +176,7 @@ export default function Matches() {
                 <MatchCard
                   key={match.id}
                   match={match}
-                  currentUserId={profile?.id}
+                  currentUserId={currentUserId}
                   isSaving={savePrediction.isPending}
                   groupStageDeadline={groupStageDeadline}
                   onSavePrediction={handleSavePrediction}
