@@ -59,10 +59,7 @@ export default function Login() {
             </div>
             <h1 className="max-w-md font-display text-4xl text-ink sm:text-6xl">Polla Mundialista 2026</h1>
             <p className="mt-4 max-w-md text-lg leading-tight text-ink/85">
-              La plataforma está bajo estricta supervisión técnica. Sí, la foto está puesta a propósito.
-            </p>
-            <p className="mt-3 max-w-md text-sm text-accent-dark">
-              Si alguien pregunta, dile que esto fue aprobado por el comité disciplinario y por el amigo de la foto.
+              La plataforma está bajo estricta supervisión técnica.
             </p>
           </div>
         </section>
