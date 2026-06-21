@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { LoaderCircle, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import friendPhoto from '../assets/login-friend.png'
 
 export default function Login() {
   const { session, signIn, signUp } = useAuth()
@@ -47,107 +48,126 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary bg-pitch bg-pitch px-4 py-8 text-white">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/60 p-8 shadow-2xl backdrop-blur">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white/10 text-4xl">
-            ⚽
+    <div className="flex min-h-screen items-center justify-center bg-primary bg-pitch px-4 py-8 text-ink">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] border border-border bg-primary/60 shadow-2xl backdrop-blur md:grid-cols-[1.05fr_0.95fr]">
+        <section className="relative min-h-[360px] border-b border-border md:min-h-[720px] md:border-b-0 md:border-r">
+          <img src={friendPhoto} alt="Invitado especial del torneo" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,31,22,0.08)_0%,rgba(3,31,22,0.74)_48%,rgba(3,31,22,0.94)_100%)]" />
+          <div className="relative flex h-full flex-col justify-end p-6 sm:p-8">
+            <div className="mb-4 inline-flex w-fit items-center rounded-full border border-[#8b7449] bg-primary/70 px-4 py-2 text-sm font-semibold text-accent backdrop-blur">
+              Veedor oficial del torneo
+            </div>
+            <h1 className="max-w-md font-display text-4xl text-ink sm:text-6xl">Polla Mundialista 2026</h1>
+            <p className="mt-4 max-w-md text-lg leading-tight text-ink/85">
+              La plataforma está bajo estricta supervisión técnica. Sí, la foto está puesta a propósito.
+            </p>
+            <p className="mt-3 max-w-md text-sm text-accent-dark">
+              Si alguien pregunta, dile que esto fue aprobado por el comité disciplinario y por el amigo de la foto.
+            </p>
           </div>
-          <h1 className="font-display text-5xl uppercase">Polla Mundialista 2026</h1>
-          <p className="mt-3 text-sm text-white/70">
-            {mode === 'signup' ? 'Crea tu cuenta para entrar al torneo.' : 'Ingresa con tu cuenta.'}
-          </p>
-        </div>
+        </section>
 
-        <div className="mb-6 grid grid-cols-2 rounded-lg border border-white/10 bg-white/5 p-1">
-          <button
-            type="button"
-            onClick={() => {
-              setMode('signin')
-              setError('')
-              setSuccess('')
-            }}
-            className={[
-              'rounded-md px-3 py-2 text-sm font-semibold transition',
-              mode === 'signin' ? 'bg-white text-slate-950' : 'text-white/75',
-            ].join(' ')}
-          >
-            Entrar
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('signup')
-              setError('')
-              setSuccess('')
-            }}
-            className={[
-              'rounded-md px-3 py-2 text-sm font-semibold transition',
-              mode === 'signup' ? 'bg-white text-slate-950' : 'text-white/75',
-            ].join(' ')}
-          >
-            Registrarse
-          </button>
-        </div>
+        <section className="p-6 sm:p-8 md:p-10">
+          <div className="mb-8">
+            <div className="inline-flex items-center rounded-full border border-[#8b7449] bg-accent/12 px-4 py-2 text-sm font-semibold text-accent">
+              Acceso privado
+            </div>
+            <h2 className="mt-4 font-display text-4xl text-ink">{mode === 'signup' ? 'Crea tu cuenta' : 'Entra al torneo'}</h2>
+            <p className="mt-3 text-sm text-muted">
+              {mode === 'signup' ? 'Regístrate para empezar a lanzar tus resultados.' : 'Ingresa con tu correo para seguir la pelea del ranking.'}
+            </p>
+          </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {mode === 'signup' ? (
+          <div className="mb-6 grid grid-cols-2 rounded-xl border border-border bg-surface/60 p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signin')
+                setError('')
+                setSuccess('')
+              }}
+              className={[
+                'rounded-lg px-3 py-2 text-sm font-semibold transition',
+                mode === 'signin' ? 'bg-accent text-primary' : 'text-muted hover:text-ink',
+              ].join(' ')}
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signup')
+                setError('')
+                setSuccess('')
+              }}
+              className={[
+                'rounded-lg px-3 py-2 text-sm font-semibold transition',
+                mode === 'signup' ? 'bg-accent text-primary' : 'text-muted hover:text-ink',
+              ].join(' ')}
+            >
+              Registrarse
+            </button>
+          </div>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {mode === 'signup' ? (
+              <label className="block">
+                <span className="mb-2 block text-sm text-muted">Nombre</span>
+                <input
+                  type="text"
+                  autoComplete="name"
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  className="w-full rounded-xl border border-border bg-primary-light/85 px-4 py-3 text-ink placeholder:text-muted outline-none transition focus:border-accent"
+                  placeholder="Tu nombre"
+                  required
+                />
+              </label>
+            ) : null}
+
             <label className="block">
-              <span className="mb-2 block text-sm text-white/75">Nombre</span>
+              <span className="mb-2 block text-sm text-muted">Email</span>
               <input
-                type="text"
-                autoComplete="name"
-                value={displayName}
-                onChange={(event) => setDisplayName(event.target.value)}
-                className="w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/35"
-                placeholder="Tu nombre"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full rounded-xl border border-border bg-primary-light/85 px-4 py-3 text-ink placeholder:text-muted outline-none transition focus:border-accent"
+                placeholder="tu-correo@ejemplo.com"
                 required
               />
             </label>
-          ) : null}
 
-          <label className="block">
-            <span className="mb-2 block text-sm text-white/75">Email</span>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/35"
-              placeholder="tu-correo@ejemplo.com"
-              required
-            />
-          </label>
+            <label className="block">
+              <span className="mb-2 block text-sm text-muted">Contraseña</span>
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="w-full rounded-xl border border-border bg-primary-light/85 px-4 py-3 text-ink placeholder:text-muted outline-none transition focus:border-accent"
+                placeholder="••••••••"
+                required
+              />
+            </label>
 
-          <label className="block">
-            <span className="mb-2 block text-sm text-white/75">Contraseña</span>
-            <input
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/35"
-              placeholder="••••••••"
-              required
-            />
-          </label>
+            {success ? <p className="rounded-xl border border-[#2f5c46] bg-[#173327] px-4 py-3 text-sm text-[#9be1b5]">{success}</p> : null}
+            {error ? <p className="rounded-xl border border-[#6f2e28] bg-[#3c1714] px-4 py-3 text-sm text-[#ff9b8d]">{error}</p> : null}
 
-          {success ? <p className="rounded-lg bg-emerald-500/15 px-4 py-3 text-sm text-emerald-200">{success}</p> : null}
-          {error ? <p className="rounded-lg bg-red-500/15 px-4 py-3 text-sm text-red-200">{error}</p> : null}
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 font-semibold text-primary transition hover:bg-[#ffd89d] disabled:cursor-not-allowed disabled:bg-primary-light disabled:text-muted"
+            >
+              {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+              {mode === 'signup' ? 'Crear cuenta' : 'Entrar al torneo'}
+            </button>
+          </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 font-semibold text-slate-950 transition hover:bg-[#f6b785] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-            {mode === 'signup' ? 'Crear cuenta' : 'Entrar al torneo'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm text-white/60">
-          {mode === 'signup' ? 'Usa un correo válido para recuperar acceso luego.' : '¿Olvidaste tu contraseña? Habla con el organizador.'}
-        </p>
+          <p className="mt-4 text-center text-sm text-muted">
+            {mode === 'signup' ? 'Usa un correo válido para recuperar acceso luego.' : '¿Olvidaste tu contraseña? Habla con el organizador.'}
+          </p>
+        </section>
       </div>
     </div>
   )
