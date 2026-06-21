@@ -45,3 +45,41 @@ export function buildPerformanceSummary(matches, userId) {
 
   return summary
 }
+
+export function categorizeFinishedMatches(matches, userId) {
+  const buckets = {
+    exact: [],
+    correct: [],
+    wrong: [],
+    missed: [],
+  }
+
+  matches
+    .filter((match) => match.status === 'finished')
+    .forEach((match) => {
+      const prediction = getUserPrediction(match, userId)
+
+      if (!prediction) {
+        buckets.missed.push(match)
+        return
+      }
+
+      if (prediction.points_earned > 0 && prediction.is_calculated) {
+        const isExact =
+          prediction.predicted_home_score === (match.home_score_ft ?? match.home_score) &&
+          prediction.predicted_away_score === (match.away_score_ft ?? match.away_score)
+
+        if (isExact) {
+          buckets.exact.push(match)
+        } else {
+          buckets.correct.push(match)
+        }
+
+        return
+      }
+
+      buckets.wrong.push(match)
+    })
+
+  return buckets
+}

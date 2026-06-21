@@ -16,9 +16,9 @@ function TeamBadge({ logo, name }) {
 }
 
 function formatResultLabel(match, prediction) {
-  if (!prediction) return { tone: 'default', text: 'No predicho' }
+  if (!prediction) return { tone: 'default', text: 'No predicho · 0 pts' }
   if (!prediction.is_calculated) return { tone: 'default', text: 'Pendiente de cálculo' }
-  if (prediction.points_earned <= 0) return { tone: 'default', text: '0 pts' }
+  if (prediction.points_earned <= 0) return { tone: 'default', text: 'Fallado · 0 pts' }
 
   const exact =
     prediction.predicted_home_score === (match.home_score_ft ?? match.home_score) &&

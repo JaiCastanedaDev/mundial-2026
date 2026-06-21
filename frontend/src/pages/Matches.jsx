@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, ChevronDown, Filter, XCircle } from 'lucide-react'
+import { CheckCircle2, ChevronDown, Filter, X, XCircle } from 'lucide-react'
 import MatchCard from '../components/matches/MatchCard'
 import MatchTabs from '../components/matches/MatchTabs'
 import MyPerformancePanel from '../components/matches/MyPerformancePanel'
@@ -7,7 +7,7 @@ import Spinner from '../components/ui/Spinner'
 import { useAuth } from '../contexts/AuthContext'
 import { useAppSettings } from '../hooks/useAppSettings'
 import { useMatches, useSavePrediction } from '../hooks/useMatches'
-import { buildPerformanceSummary, countMissingGroupStagePredictions } from '../hooks/usePredictions'
+import { buildPerformanceSummary, categorizeFinishedMatches, countMissingGroupStagePredictions } from '../hooks/usePredictions'
 import { useRanking } from '../hooks/useRanking'
 import { isGroupStageMatch, isPredictionClosed, parsePredictionDeadline } from '../lib/scoring'
 
@@ -44,6 +44,7 @@ export default function Matches() {
   const savePrediction = useSavePrediction()
   const [activeTab, setActiveTab] = useState('upcoming')
   const [finishedStageFilter, setFinishedStageFilter] = useState('all')
+  const [performanceFilter, setPerformanceFilter] = useState(null)
   const [saveFeedback, setSaveFeedback] = useState(null)
   const worldCupMatches = useMemo(() => matches.filter(isWorldCupMatch), [matches])
   const currentUserId = session?.user?.id ?? profile?.id ?? null
@@ -63,10 +64,22 @@ export default function Matches() {
     [groupStageDeadline, worldCupMatches],
   )
 
+  const finishedBuckets = useMemo(
+    () => categorizeFinishedMatches(worldCupMatches, currentUserId),
+    [currentUserId, worldCupMatches],
+  )
+
   const filteredFinished = useMemo(() => {
-    if (finishedStageFilter === 'all') return byStatus.finished
-    return byStatus.finished.filter((match) => match.stage === finishedStageFilter)
-  }, [byStatus.finished, finishedStageFilter])
+    const stageFiltered =
+      finishedStageFilter === 'all'
+        ? byStatus.finished
+        : byStatus.finished.filter((match) => match.stage === finishedStageFilter)
+
+    if (!performanceFilter) return stageFiltered
+
+    const allowedIds = new Set((finishedBuckets[performanceFilter] ?? []).map((match) => match.id))
+    return stageFiltered.filter((match) => allowedIds.has(match.id))
+  }, [byStatus.finished, finishedBuckets, finishedStageFilter, performanceFilter])
 
   const visibleMatches =
     activeTab === 'live' ? byStatus.live : activeTab === 'finished' ? filteredFinished : byStatus.upcoming
@@ -89,6 +102,17 @@ export default function Matches() {
     const timeoutId = window.setTimeout(() => setSaveFeedback(null), 3500)
     return () => window.clearTimeout(timeoutId)
   }, [saveFeedback])
+
+  useEffect(() => {
+    if (activeTab !== 'finished' && performanceFilter) {
+      setPerformanceFilter(null)
+    }
+  }, [activeTab, performanceFilter])
+
+  function handleSelectPerformanceFilter(filterKey) {
+    setActiveTab('finished')
+    setPerformanceFilter((current) => (current === filterKey ? null : filterKey))
+  }
 
   async function handleSavePrediction(matchId, homeScore, awayScore) {
     if (!currentUserId) {
@@ -178,7 +202,28 @@ export default function Matches() {
         />
 
         {activeTab === 'finished' ? (
-          <div className="mb-4 flex items-center justify-end">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            {performanceFilter ? (
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#8b7449] bg-primary-light/80 px-4 py-2 text-sm text-accent">
+                Viendo:{' '}
+                <span className="font-semibold">
+                  {{
+                    exact: 'marcadores exactos',
+                    correct: 'resultados correctos',
+                    wrong: 'fallados',
+                    missed: 'no predichos',
+                  }[performanceFilter]}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPerformanceFilter(null)}
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-accent-dark transition hover:text-accent"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : <div />}
+
             <label className="flex items-center gap-2 rounded-full border border-border bg-surface/75 px-4 py-2 text-sm text-ink">
               <Filter className="h-4 w-4 text-muted" />
               <select
@@ -234,7 +279,12 @@ export default function Matches() {
         </div>
       </section>
 
-      <MyPerformancePanel rankingEntry={rankingEntry} summary={performance} />
+      <MyPerformancePanel
+        rankingEntry={rankingEntry}
+        summary={performance}
+        activeFilter={performanceFilter}
+        onSelectFilter={handleSelectPerformanceFilter}
+      />
     </div>
   )
 }
