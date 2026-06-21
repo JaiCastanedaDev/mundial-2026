@@ -38,8 +38,18 @@ supabase functions deploy sync-matches
 supabase functions deploy calculate-scores
 ```
 
+5. Aplica migraciones, incluido el cron:
+
+```bash
+supabase db push
+```
+
+Esto deja programados dos jobs con `pg_cron`:
+
+- `worldcup-sync-matches-every-minute`: ejecuta `sync-matches` cada minuto.
+- `worldcup-recalculate-scores-every-2-minutes`: ejecuta `calculate-scores` cada 2 minutos como respaldo.
+
 ## Pendiente manual
 
 - Confirmar si `WORLDCUP26_TOKEN` es obligatorio en el entorno objetivo.
-- Configurar el cron de Supabase con `pg_cron`.
 - Completar la lista final de participantes en `scripts/create-users.js`.
