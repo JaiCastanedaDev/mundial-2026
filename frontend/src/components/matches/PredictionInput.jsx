@@ -8,6 +8,10 @@ function clampScore(value) {
   return Math.min(parsed, 99)
 }
 
+function normalizeScoreValue(value) {
+  return value === '' || value === null || value === undefined ? '' : String(value)
+}
+
 function adjustScore(currentValue, delta) {
   const baseValue = currentValue === '' ? 0 : Number(currentValue)
   return clampScore(String(baseValue + delta))
@@ -55,8 +59,8 @@ export default function PredictionInput({ match, prediction, onSave, isSaving, g
   const [countdown, setCountdown] = useState(null)
   const closed = isPredictionClosed(match, groupStageDeadline)
   const hasChanges =
-    Number(homeScore) !== Number(prediction?.predicted_home_score ?? '') ||
-    Number(awayScore) !== Number(prediction?.predicted_away_score ?? '')
+    normalizeScoreValue(homeScore) !== normalizeScoreValue(prediction?.predicted_home_score) ||
+    normalizeScoreValue(awayScore) !== normalizeScoreValue(prediction?.predicted_away_score)
 
   useEffect(() => {
     setHomeScore(prediction?.predicted_home_score ?? '')
