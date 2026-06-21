@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export function useMatches() {
-  return useQuery({
+  const queryClient = useQueryClient()
+  const query = useQuery({
     queryKey: ['matches'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -30,9 +32,38 @@ export function useMatches() {
     },
     refetchInterval: (query) => {
       const matches = query.state.data ?? []
-      return matches.some((match) => match.status === 'live') ? 60_000 : 300_000
+      return matches.some((match) => match.status === 'live') ? 15_000 : 120_000
     },
+    refetchOnWindowFocus: true,
   })
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('matches-live-updates')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'matches' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['matches'] })
+          queryClient.invalidateQueries({ queryKey: ['ranking'] })
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'predictions' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['matches'] })
+          queryClient.invalidateQueries({ queryKey: ['ranking'] })
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [queryClient])
+
+  return query
 }
 
 export function useSavePrediction() {

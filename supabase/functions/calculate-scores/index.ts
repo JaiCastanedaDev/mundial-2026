@@ -29,7 +29,6 @@ Deno.serve(async (request) => {
         .from('predictions')
         .select('id, user_id, predicted_home_score, predicted_away_score')
         .eq('match_id', match.id)
-        .eq('is_calculated', false)
 
       if (predictionsError) throw predictionsError
       if (!predictions?.length) continue
