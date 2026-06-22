@@ -34,6 +34,7 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
   const resultLabel = formatResultLabel(match, userPrediction)
   const formattedDate = format(new Date(match.match_date), "d MMM yyyy, HH:mm", { locale: es })
   const canEditPrediction = Boolean(currentUserId) && !isPredictionClosed(match, groupStageDeadline)
+  const shouldShowPredictionPanel = canEditPrediction || (match.status === 'scheduled' && Boolean(userPrediction))
 
   return (
     <article className="panel p-5">
@@ -86,7 +87,7 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
         </div>
       </div>
 
-      {canEditPrediction ? (
+      {shouldShowPredictionPanel ? (
         <>
           <PredictionInput
             match={match}
@@ -96,11 +97,13 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
             saveState={saveState}
             onSave={(homeScore, awayScore) => onSavePrediction(match.id, homeScore, awayScore)}
           />
-          <p className="mt-3 text-sm text-muted">
-            {userPrediction
-              ? `Predicción guardada: ${userPrediction.predicted_home_score}-${userPrediction.predicted_away_score}`
-              : 'Aún no has enviado predicción para este partido.'}
-          </p>
+          {canEditPrediction ? (
+            <p className="mt-3 text-sm text-muted">
+              {userPrediction
+                ? `Predicción guardada: ${userPrediction.predicted_home_score}-${userPrediction.predicted_away_score}`
+                : 'Aún no has enviado predicción para este partido.'}
+            </p>
+          ) : null}
         </>
       ) : null}
 
