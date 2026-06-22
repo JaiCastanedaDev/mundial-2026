@@ -21,8 +21,20 @@ function isWorldCupMatch(match) {
   return hasValidDate && matchDate >= WORLD_CUP_2026_START && matchDate < WORLD_CUP_2026_END
 }
 
+function getMatchTimestamp(match) {
+  return new Date(match.match_date).getTime()
+}
+
+function compareMatchesByDateAsc(a, b) {
+  return getMatchTimestamp(a) - getMatchTimestamp(b)
+}
+
+function compareMatchesByDateDesc(a, b) {
+  return getMatchTimestamp(b) - getMatchTimestamp(a)
+}
+
 function groupMatches(matches) {
-  return matches.reduce((acc, match) => {
+  const groupedMatches = matches.reduce((acc, match) => {
     const dayKey = new Intl.DateTimeFormat('es-CO', {
       weekday: 'long',
       day: 'numeric',
@@ -34,6 +46,13 @@ function groupMatches(matches) {
     acc[groupKey].items.push(match)
     return acc
   }, {})
+
+  return Object.values(groupedMatches)
+    .map((group) => ({
+      ...group,
+      items: [...group.items].sort(compareMatchesByDateAsc),
+    }))
+    .sort((a, b) => compareMatchesByDateAsc(a.items[0], b.items[0]))
 }
 
 export default function Matches() {
@@ -56,11 +75,13 @@ export default function Matches() {
 
   const byStatus = useMemo(
     () => ({
-      live: worldCupMatches.filter((match) => match.status === 'live'),
-      upcoming: worldCupMatches.filter((match) => !isPredictionClosed(match, groupStageDeadline)),
+      live: worldCupMatches.filter((match) => match.status === 'live').sort(compareMatchesByDateAsc),
+      upcoming: worldCupMatches
+        .filter((match) => !isPredictionClosed(match, groupStageDeadline))
+        .sort(compareMatchesByDateAsc),
       finished: worldCupMatches
         .filter((match) => match.status === 'finished')
-        .sort((a, b) => new Date(b.match_date) - new Date(a.match_date)),
+        .sort(compareMatchesByDateDesc),
     }),
     [groupStageDeadline, worldCupMatches],
   )
@@ -85,7 +106,7 @@ export default function Matches() {
   const visibleMatches =
     activeTab === 'live' ? byStatus.live : activeTab === 'finished' ? filteredFinished : byStatus.upcoming
 
-  const groupedUpcoming = useMemo(() => Object.values(groupMatches(byStatus.upcoming)), [byStatus.upcoming])
+  const groupedUpcoming = useMemo(() => groupMatches(byStatus.upcoming), [byStatus.upcoming])
   const performance = useMemo(
     () => buildPerformanceSummary(worldCupMatches, currentUserId),
     [currentUserId, worldCupMatches],
