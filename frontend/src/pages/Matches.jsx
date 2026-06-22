@@ -202,8 +202,8 @@ export default function Matches() {
 
         {groupStageDeadline && new Date() < groupStageDeadline ? (
           <div className="mb-6 rounded-xl border border-[#6a5530] bg-[#3a2d14] px-4 py-3 text-sm text-accent">
-            Te faltan {missingGroupStagePredictions} pronósticos de fase de grupos. Puedes completarlos en cualquier
-            momento.
+            Te faltan {missingGroupStagePredictions} predicciones de fase de grupos. Debes completarlas antes del{' '}
+            {groupStageDeadline.toLocaleString('es-CO')}.
           </div>
         ) : null}
 
