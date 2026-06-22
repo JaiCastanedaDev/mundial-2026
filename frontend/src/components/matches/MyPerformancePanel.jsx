@@ -19,12 +19,12 @@ function Stat({ icon: Icon, label, value, tone, isActive, onClick }) {
   )
 }
 
-export default function MyPerformancePanel({ rankingEntry, summary, activeFilter, onSelectFilter }) {
+export default function MyPerformancePanel({ rankingEntry, summary, activeFilter, onSelectFilter, className = '' }) {
   const attempts = summary.exact + summary.correct + summary.wrong
   const precision = attempts > 0 ? ((summary.exact + summary.correct) / attempts) * 100 : 0
 
   return (
-    <aside className="panel p-5 lg:sticky lg:top-6">
+    <aside className={['panel p-5 lg:sticky lg:top-6', className].join(' ')}>
       <div className="border-b border-border pb-4">
         <p className="text-sm text-muted">Tu torneo</p>
         <div className="mt-2 flex items-center justify-between">

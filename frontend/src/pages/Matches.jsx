@@ -191,6 +191,14 @@ export default function Matches() {
           </div>
         ) : null}
 
+        <MyPerformancePanel
+          className="mb-6 lg:hidden"
+          rankingEntry={rankingEntry}
+          summary={performance}
+          activeFilter={performanceFilter}
+          onSelectFilter={handleSelectPerformanceFilter}
+        />
+
         <MatchTabs
           activeTab={activeTab}
           counts={{
@@ -280,6 +288,7 @@ export default function Matches() {
       </section>
 
       <MyPerformancePanel
+        className="hidden lg:block"
         rankingEntry={rankingEntry}
         summary={performance}
         activeFilter={performanceFilter}
