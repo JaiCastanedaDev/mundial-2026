@@ -9,7 +9,7 @@ import { useAppSettings } from '../hooks/useAppSettings'
 import { useMatches, useSavePrediction } from '../hooks/useMatches'
 import { buildPerformanceSummary, categorizeFinishedMatches, countMissingGroupStagePredictions } from '../hooks/usePredictions'
 import { useRanking } from '../hooks/useRanking'
-import { isGroupStageMatch, isPredictionClosed, parsePredictionDeadline } from '../lib/scoring'
+import { isGroupStageMatch, parsePredictionDeadline } from '../lib/scoring'
 
 const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
 const WORLD_CUP_2026_END = new Date('2026-07-20T00:00:00Z')
@@ -23,6 +23,10 @@ function isWorldCupMatch(match) {
 
 function getMatchTimestamp(match) {
   return new Date(match.match_date).getTime()
+}
+
+function isUpcomingMatch(match) {
+  return match.status === 'scheduled' && getMatchTimestamp(match) > Date.now()
 }
 
 function compareMatchesByDateAsc(a, b) {
@@ -76,14 +80,12 @@ export default function Matches() {
   const byStatus = useMemo(
     () => ({
       live: worldCupMatches.filter((match) => match.status === 'live').sort(compareMatchesByDateAsc),
-      upcoming: worldCupMatches
-        .filter((match) => !isPredictionClosed(match, groupStageDeadline))
-        .sort(compareMatchesByDateAsc),
+      upcoming: worldCupMatches.filter(isUpcomingMatch).sort(compareMatchesByDateAsc),
       finished: worldCupMatches
         .filter((match) => match.status === 'finished')
         .sort(compareMatchesByDateDesc),
     }),
-    [groupStageDeadline, worldCupMatches],
+    [worldCupMatches],
   )
 
   const finishedBuckets = useMemo(
