@@ -43,17 +43,9 @@ export function parsePredictionDeadline(value) {
 }
 
 export function isPredictionClosed(match, groupStageDeadline) {
-  if (isGroupStageMatch(match)) {
-    return groupStageDeadline ? groupStageDeadline <= new Date() : false
-  }
-
-  return match.status !== 'scheduled' || new Date(match.match_date) <= new Date()
+  return false
 }
 
 export function getPredictionHelperText(match, groupStageDeadline) {
-  if (isGroupStageMatch(match) && groupStageDeadline && groupStageDeadline > new Date()) {
-    return `Tienes hasta el ${groupStageDeadline.toLocaleString('es-CO')} para completar la fase de grupos.`
-  }
-
-  return 'Predicción cerrada. El partido ya inició o cambió de estado.'
+  return 'Puedes guardar o editar tu pronóstico en cualquier momento.'
 }

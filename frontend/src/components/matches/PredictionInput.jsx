@@ -124,7 +124,7 @@ export default function PredictionInput({ match, prediction, onSave, isSaving, g
               <Lock className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-accent">Resultado bloqueado</p>
+              <p className="text-sm font-semibold text-accent">Pronóstico guardado</p>
               <p className="text-sm text-accent-dark">
                 {prediction.predicted_home_score} - {prediction.predicted_away_score}
               </p>
@@ -144,9 +144,7 @@ export default function PredictionInput({ match, prediction, onSave, isSaving, g
         </div>
 
         <p className="mt-3 text-sm text-muted">
-          {closed
-            ? getPredictionHelperText(match, groupStageDeadline)
-            : 'Puedes volver a editarlo mientras la ventana de predicción siga abierta.'}
+          {closed ? getPredictionHelperText(match, groupStageDeadline) : 'Puedes editarlo cuando quieras.'}
         </p>
       </div>
     )
