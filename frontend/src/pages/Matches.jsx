@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronDown, Filter, X, XCircle } from 'lucide-react'
 import MatchCard from '../components/matches/MatchCard'
 import MatchTabs from '../components/matches/MatchTabs'
@@ -46,6 +46,7 @@ export default function Matches() {
   const [finishedStageFilter, setFinishedStageFilter] = useState('all')
   const [performanceFilter, setPerformanceFilter] = useState(null)
   const [saveFeedback, setSaveFeedback] = useState(null)
+  const matchesListRef = useRef(null)
   const worldCupMatches = useMemo(() => matches.filter(isWorldCupMatch), [matches])
   const currentUserId = session?.user?.id ?? profile?.id ?? null
   const groupStageDeadline = useMemo(
@@ -108,6 +109,16 @@ export default function Matches() {
       setPerformanceFilter(null)
     }
   }, [activeTab, performanceFilter])
+
+  useEffect(() => {
+    if (!performanceFilter) return
+
+    const timeoutId = window.setTimeout(() => {
+      matchesListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [performanceFilter])
 
   function handleSelectPerformanceFilter(filterKey) {
     setActiveTab('finished')
@@ -251,7 +262,7 @@ export default function Matches() {
           </div>
         ) : null}
 
-        <div className="space-y-4">
+        <div ref={matchesListRef} className="space-y-4">
           {activeTab === 'upcoming'
             ? groupedUpcoming.map((group) => (
                 <div key={group.label} className="space-y-4">
