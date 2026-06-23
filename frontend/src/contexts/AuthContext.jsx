@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
@@ -28,82 +28,105 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const isMountedRef = useRef(false)
 
   useEffect(() => {
-    let active = true
+    isMountedRef.current = true
 
     async function bootstrap() {
-      const [{ data: sessionData }, profileData] = await Promise.all([
-        supabase.auth.getSession(),
-        supabase.auth.getUser(),
-      ])
+      try {
+        const { data: sessionData, error } = await supabase.auth.getSession()
 
-      if (!active) return
+        if (error) throw error
+        if (!isMountedRef.current) return
 
-      setSession(sessionData.session)
+        const nextSession = sessionData.session
+        setSession(nextSession)
+        setLoading(false)
 
-      if (profileData.data.user) {
-        await loadProfile(profileData.data.user.id, profileData.data.user)
-      } else {
+        if (nextSession?.user?.id) {
+          void loadProfile(nextSession.user.id, nextSession.user)
+        } else {
+          setProfile(null)
+        }
+      } catch (bootstrapError) {
+        console.error('Error bootstrapping auth session', bootstrapError)
+        if (!isMountedRef.current) return
+        setSession(null)
+        setProfile(null)
         setLoading(false)
       }
     }
 
-    bootstrap()
+    void bootstrap()
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!isMountedRef.current) return
+
       setSession(nextSession)
+      setLoading(false)
 
       if (nextSession?.user?.id) {
-        await loadProfile(nextSession.user.id, nextSession.user)
+        void loadProfile(nextSession.user.id, nextSession.user)
       } else {
         setProfile(null)
-        setLoading(false)
       }
     })
 
     return () => {
-      active = false
+      isMountedRef.current = false
       subscription.unsubscribe()
     }
   }, [])
 
   async function loadProfile(userId, user = null) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
-
-    if (error) {
-      console.error('Error loading profile', error)
-    }
-
-    if (!data && user) {
-      const defaults = buildProfileDefaults(user)
-      const { data: createdProfile, error: createError } = await supabase
+    try {
+      const { data, error } = await supabase
         .from('profiles')
-        .insert({
-          id: userId,
-          username: defaults.username,
-          display_name: defaults.display_name,
-        })
         .select('*')
-        .single()
+        .eq('id', userId)
+        .maybeSingle()
 
-      if (createError) {
-        console.error('Error creating profile', createError)
-        setProfile(null)
-      } else {
-        setProfile(createdProfile)
+      if (error) {
+        console.error('Error loading profile', error)
       }
-    } else {
-      setProfile(data ?? null)
-    }
 
-    setLoading(false)
+      if (!isMountedRef.current) return null
+
+      if (!data && user) {
+        const defaults = buildProfileDefaults(user)
+        const { data: createdProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            username: defaults.username,
+            display_name: defaults.display_name,
+          })
+          .select('*')
+          .single()
+
+        if (createError) {
+          console.error('Error creating profile', createError)
+          if (isMountedRef.current) setProfile(null)
+          return null
+        }
+
+        if (isMountedRef.current) setProfile(createdProfile)
+        return createdProfile
+      }
+
+      if (isMountedRef.current) {
+        setProfile(data ?? null)
+      }
+
+      return data ?? null
+    } catch (profileError) {
+      console.error('Unexpected profile loading error', profileError)
+      if (isMountedRef.current) setProfile(null)
+      return null
+    }
   }
 
   async function refreshProfile() {
