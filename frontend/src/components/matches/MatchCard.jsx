@@ -3,6 +3,7 @@ import { es } from 'date-fns/locale'
 import Badge from '../ui/Badge'
 import PredictionInput from './PredictionInput'
 import { getUserPrediction } from '../../hooks/usePredictions'
+import { translateStageLabel } from '../../lib/labels'
 import { isPredictionClosed } from '../../lib/scoring'
 
 function TeamBadge({ logo, name }) {
@@ -46,7 +47,7 @@ export default function MatchCard({ match, currentUserId, onSavePrediction, isSa
             </Badge>
           ) : null}
           {match.status === 'finished' ? <Badge tone="success">Finalizado</Badge> : null}
-          <Badge tone="default">{match.stage}</Badge>
+          <Badge tone="default">{translateStageLabel(match.stage)}</Badge>
           {match.group_name ? <Badge tone="default">Grupo {match.group_name}</Badge> : null}
         </div>
         <p className="text-sm text-muted">{formattedDate}</p>

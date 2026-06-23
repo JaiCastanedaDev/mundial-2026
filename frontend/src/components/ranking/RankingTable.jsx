@@ -78,7 +78,7 @@ function PodiumCard({ row, rank, featured = false }) {
 
       {featured ? (
         <div className="mt-3 rounded-full bg-accent px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary sm:mt-4 sm:px-6 sm:py-2 sm:text-sm">
-          Winner
+          Ganador
         </div>
       ) : null}
 
@@ -97,7 +97,7 @@ function PodiumCard({ row, rank, featured = false }) {
       >
         <p className={['font-display uppercase', valueClasses].join(' ')}>{formatPoints(row.total_points)}</p>
         <p className={featured ? 'mt-2 text-base uppercase tracking-[0.22em] text-accent-dark sm:text-lg' : 'mt-2 text-xs uppercase tracking-[0.22em] text-muted sm:text-sm'}>
-          Points
+          Puntos
         </p>
       </div>
     </Link>
@@ -132,7 +132,7 @@ function RankingRow({ row, currentUserId }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className={['truncate text-lg font-semibold sm:text-2xl', isCurrentUser ? 'text-accent' : 'text-ink'].join(' ')}>
-          {isCurrentUser ? `You (${row.display_name})` : row.display_name}
+          {isCurrentUser ? `Tú (${row.display_name})` : row.display_name}
         </p>
         <p className={['text-sm leading-5 sm:truncate sm:text-base', isCurrentUser ? 'text-accent-dark/90' : 'text-muted'].join(' ')}>
           {subtitle}
@@ -140,10 +140,10 @@ function RankingRow({ row, currentUserId }) {
       </div>
       <div className="w-full border-t border-white/10 pt-3 text-left sm:w-auto sm:border-t-0 sm:pt-0 sm:text-right">
         <p className={['font-display text-3xl uppercase sm:text-5xl', isCurrentUser ? 'text-accent' : 'text-ink'].join(' ')}>
-          {row.total_points.toLocaleString('en-US')}
+          {row.total_points.toLocaleString('es-CO')}
         </p>
         <p className={['mt-1 text-sm font-semibold sm:text-lg', isCurrentUser ? 'text-accent' : 'text-muted'].join(' ')}>
-          {isCurrentUser ? 'Stable' : `${row.correct_results} aciertos`}
+          {isCurrentUser ? 'Tu saldo actual' : `${row.correct_results} aciertos`}
         </p>
       </div>
     </Link>
@@ -170,7 +170,7 @@ export default function RankingTable({ rows, currentUserId }) {
       ) : null}
 
       <div className="flex items-center justify-between px-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:text-sm sm:tracking-[0.28em]">Global Rankings</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:text-sm sm:tracking-[0.28em]">Ranking global</p>
         <SlidersHorizontal className="h-4 w-4 text-muted" />
       </div>
 

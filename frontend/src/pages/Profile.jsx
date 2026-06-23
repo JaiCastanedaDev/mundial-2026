@@ -10,6 +10,7 @@ import { useMatches } from '../hooks/useMatches'
 import { useProfileByUsername, useUpdateProfile } from '../hooks/useProfiles'
 import { buildPerformanceSummary, getUserPrediction } from '../hooks/usePredictions'
 import { useRanking } from '../hooks/useRanking'
+import { translateMatchStatusLabel, translateStageLabel } from '../lib/labels'
 
 const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
 const WORLD_CUP_2026_END = new Date('2026-07-20T00:00:00Z')
@@ -110,7 +111,7 @@ function ProfileMatchCard({ match, prediction, isOwnProfile }) {
     <article className="rounded-2xl border border-border bg-surface/82 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{match.stage}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{translateStageLabel(match.stage)}</p>
           <p className="mt-1 text-sm text-muted">{statusLabel}</p>
         </div>
         <span
@@ -123,7 +124,7 @@ function ProfileMatchCard({ match, prediction, isOwnProfile }) {
                 : 'border-border bg-primary-light/60 text-muted',
           ].join(' ')}
         >
-          {match.status}
+          {translateMatchStatusLabel(match.status)}
         </span>
       </div>
 

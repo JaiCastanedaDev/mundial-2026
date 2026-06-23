@@ -9,6 +9,7 @@ import { useAppSettings } from '../hooks/useAppSettings'
 import { useMatches, useSavePrediction } from '../hooks/useMatches'
 import { buildPerformanceSummary, categorizeFinishedMatches, countMissingGroupStagePredictions } from '../hooks/usePredictions'
 import { useRanking } from '../hooks/useRanking'
+import { translateStageLabel } from '../lib/labels'
 import { isGroupStageMatch, parsePredictionDeadline } from '../lib/scoring'
 
 const WORLD_CUP_2026_START = new Date('2026-06-11T00:00:00Z')
@@ -45,8 +46,9 @@ function groupMatches(matches) {
       month: 'long',
     }).format(new Date(match.match_date))
 
-    const groupKey = `${match.stage}__${dayKey}`
-    acc[groupKey] ??= { label: `${match.stage} · ${dayKey}`, items: [] }
+    const translatedStage = translateStageLabel(match.stage)
+    const groupKey = `${translatedStage}__${dayKey}`
+    acc[groupKey] ??= { label: `${translatedStage} · ${dayKey}`, items: [] }
     acc[groupKey].items.push(match)
     return acc
   }, {})
@@ -275,8 +277,8 @@ export default function Matches() {
               >
                 <option value="all">Todas las fases</option>
                 {finishedStages.map((stage) => (
-                  <option key={stage} value={stage}>
-                    {stage}
+                <option key={stage} value={stage}>
+                    {translateStageLabel(stage)}
                   </option>
                 ))}
               </select>
