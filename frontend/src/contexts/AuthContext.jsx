@@ -106,6 +106,12 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }
 
+  async function refreshProfile() {
+    const userId = session?.user?.id
+    if (!userId) return
+    await loadProfile(userId, session?.user ?? null)
+  }
+
   async function signIn(email, password) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
@@ -132,7 +138,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ session, profile, loading, signIn, signUp, signOut }),
+    () => ({ session, profile, loading, signIn, signUp, signOut, refreshProfile }),
     [loading, profile, session],
   )
 

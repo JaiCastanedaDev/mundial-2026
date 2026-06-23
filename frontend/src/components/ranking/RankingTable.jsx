@@ -1,4 +1,5 @@
 import { Award, SlidersHorizontal } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 function Avatar({ name, color, className = 'h-10 w-10 text-sm' }) {
   const initials = name
@@ -41,7 +42,13 @@ function PodiumCard({ row, rank, featured = false }) {
   const valueClasses = featured ? 'text-4xl text-accent sm:text-5xl lg:text-6xl' : 'text-3xl text-ink sm:text-4xl'
 
   return (
-    <div className={featured ? 'flex flex-col items-center' : 'flex flex-col items-center pt-6 sm:pt-12'}>
+    <Link
+      to={`/perfil/${row.username}`}
+      className={[
+        'group flex w-full flex-col items-center transition',
+        featured ? '' : 'pt-6 sm:pt-12',
+      ].join(' ')}
+    >
       <div className="relative">
         {!featured ? (
           <div className="absolute -bottom-1 -right-1 rounded-full border border-border bg-[#4d5d55] px-2.5 py-1 text-base font-bold text-ink shadow-sm sm:px-3 sm:text-xl">
@@ -75,7 +82,7 @@ function PodiumCard({ row, rank, featured = false }) {
         </div>
       ) : null}
 
-      <p className={featured ? 'mt-4 text-center text-2xl font-semibold text-accent sm:text-3xl' : 'mt-3 text-center text-xl font-semibold text-ink sm:text-2xl'}>
+      <p className={featured ? 'mt-4 text-center text-2xl font-semibold text-accent transition group-hover:text-[#ffe1a6] sm:text-3xl' : 'mt-3 text-center text-xl font-semibold text-ink transition group-hover:text-accent sm:text-2xl'}>
         {row.display_name}
       </p>
       {!featured ? <p className="mt-1 text-sm text-muted">@{row.username}</p> : null}
@@ -93,7 +100,7 @@ function PodiumCard({ row, rank, featured = false }) {
           Points
         </p>
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -102,9 +109,10 @@ function RankingRow({ row, currentUserId }) {
   const subtitle = buildSubtitle(row, isCurrentUser)
 
   return (
-    <div
+    <Link
+      to={`/perfil/${row.username}`}
       className={[
-        'relative flex flex-wrap items-center gap-3 overflow-hidden rounded-[26px] border px-4 py-4 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-5',
+        'relative flex flex-wrap items-center gap-3 overflow-hidden rounded-[26px] border px-4 py-4 transition hover:border-accent/45 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-5',
         isCurrentUser
           ? 'border-[#7b6842] bg-[#08251b]'
           : 'border-border bg-surface/82',
@@ -138,7 +146,7 @@ function RankingRow({ row, currentUserId }) {
           {isCurrentUser ? 'Stable' : `${row.correct_results} aciertos`}
         </p>
       </div>
-    </div>
+    </Link>
   )
 }
 

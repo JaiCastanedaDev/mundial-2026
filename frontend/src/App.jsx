@@ -4,6 +4,7 @@ import Spinner from './components/ui/Spinner'
 import { useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
 import Matches from './pages/Matches'
+import Profile from './pages/Profile'
 import Ranking from './pages/Ranking'
 import Rules from './pages/Rules'
 
@@ -39,6 +40,8 @@ export default function App() {
       >
         <Route index element={<Navigate to="/partidos" replace />} />
         <Route path="/partidos" element={<Matches />} />
+        <Route path="/perfil" element={<Profile />} />
+        <Route path="/perfil/:username" element={<Profile />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/reglas" element={<Rules />} />
       </Route>

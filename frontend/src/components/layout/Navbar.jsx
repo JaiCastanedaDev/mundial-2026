@@ -1,10 +1,11 @@
-import { Menu, Trophy, BookOpenText, CalendarRange, LogOut } from 'lucide-react'
+import { Menu, Trophy, BookOpenText, CalendarRange, LogOut, UserRound } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 
 const navItems = [
   { to: '/partidos', label: 'Partidos', icon: CalendarRange },
+  { to: '/perfil', label: 'Perfil', icon: UserRound },
   { to: '/ranking', label: 'Ranking', icon: Trophy },
   { to: '/reglas', label: 'Reglas', icon: BookOpenText },
 ]
@@ -18,7 +19,7 @@ function UserBadge({ profile }) {
     .toUpperCase()
 
   return (
-    <div className="flex items-center gap-3 rounded-full border border-border bg-surface/80 px-3 py-2 text-sm text-ink">
+    <NavLink to="/perfil" className="flex items-center gap-3 rounded-full border border-border bg-surface/80 px-3 py-2 text-sm text-ink transition hover:border-accent/50">
       <span
         className="flex h-8 w-8 items-center justify-center rounded-full font-semibold"
         style={{ backgroundColor: profile?.avatar_color ?? '#3B82F6' }}
@@ -26,7 +27,7 @@ function UserBadge({ profile }) {
         {initials ?? '?'}
       </span>
       <span className="hidden sm:block">{profile?.display_name ?? 'Usuario'}</span>
-    </div>
+    </NavLink>
   )
 }
 
